@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Workflow Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Premium AI Startup Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #050505; color: #e5e5e5; overflow-x: hidden; }
+        /* Glowing scrollbar */
+        .terminal-scroll::-webkit-scrollbar { width: 4px; }
+        .terminal-scroll::-webkit-scrollbar-track { background: transparent; }
+        .terminal-scroll::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.5); border-radius: 10px; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .input-dark {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .input-dark:focus { border-color: #6366f1; box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); outline: none; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative">
+
+    <!-- Animated Ambient Background Glows -->
+    <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-indigo-600/30 rounded-full mix-blend-screen filter blur-[100px] animate-blob z-0"></div>
+    <div class="absolute top-[20%] right-[-10%] w-96 h-96 bg-fuchsia-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-2000 z-0"></div>
+    <div class="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-cyan-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-4000 z-0"></div>
+
+    <!-- Premium Navigation -->
+    <nav class="glass-panel sticky top-0 z-10 border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="bg-gradient-to-br from-indigo-500 to-fuchsia-500 p-2 rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.4)] w-10 h-10 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-white tracking-tight">Workflow Hub <span class="text-indigo-400">AI</span></h1>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-1.5 bg-white/5 rounded-full border border-white/10">
+                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
+                <span class="text-xs font-semibold text-emerald-400 tracking-widest uppercase">System Online</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto w-full px-6 py-12 flex-1 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Side: Modern Input Form -->
+            <div class="lg:col-span-4 glass-panel p-8 rounded-2xl shadow-2xl h-fit">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-2 h-8 rounded-full bg-gradient-to-b from-indigo-500 to-fuchsia-500"></div>
+                    <h3 class="text-xl font-bold text-white">Initialize Action</h3>
+                </div>
+                
+                <form id="webhook-form" class="space-y-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Neural Route</label>
+                        <select id="route-selector" class="w-full input-dark rounded-xl px-4 py-3 text-sm transition-all appearance-none cursor-pointer">
+                            <option value="summarize-route">📢 /summarize-route (Local Gemma -> Discord)</option>
+                            <option value="extract-route">🧩 /extract-route (Local Phi-4 Mini)</option>
+                            <option value="triage-route">⚡ /triage-route (Local Nemotron Mini)</option>
+                            <option value="code-route">💻 /code-route (Local Qwen2.5 Coder)</option>
+                            <option value="whatsapp-route">📱 /whatsapp-route (Gemini Cloud -> WhatsApp)</option>
+                            <option value="calendar-route">📅 /calendar-route (Gemini Cloud -> Calendar UI)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Sender Identifier</label>
+                        <input type="text" id="student-name" class="w-full input-dark rounded-xl px-4 py-3 text-sm transition-all" placeholder="e.g. Rahul" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Raw Payload Data</label>
+                        <textarea id="message" rows="5" class="w-full input-dark rounded-xl px-4 py-3 text-sm transition-all resize-none" placeholder="Inject unstructured data here..." required></textarea>
+                    </div>
+                    <button type="submit" id="submit-btn" class="w-full bg-white text-black hover:bg-slate-200 font-bold py-3.5 px-4 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.3)] transition-all flex justify-center items-center gap-2 group">
+                        <span>Execute Workflow</span>
+                        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Side: Cyber/macOS Style Execution Terminal -->
+            <div class="lg:col-span-8 rounded-2xl shadow-2xl bg-black/60 overflow-hidden border border-white/10 flex flex-col h-[600px] backdrop-blur-xl">
+                
+                <!-- Terminal Header -->
+                <div class="bg-white/5 px-4 py-3 flex items-center border-b border-white/5">
+                    <div class="flex gap-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+                    </div>
+                    <div class="flex-1 text-center">
+                        <span class="text-xs text-slate-500 font-mono tracking-wider">nexus-core-terminal ~ bash</span>
+                    </div>
+                </div>
+                
+                <!-- Terminal Body -->
+                <div id="log-console" class="flex-1 p-6 font-mono text-sm terminal-scroll overflow-y-auto" style="line-height: 1.7;">
+                    <div class="text-slate-500">System architecture: Hybrid Edge/Cloud Node</div>
+                    <div class="text-slate-500">Initializing Nexus Engine... <span class="text-emerald-400">[OK]</span></div>
+                    <div class="text-slate-500">Establishing internal socket: http://127.0.0.1:8000 <span class="text-emerald-400">[OK]</span></div>
+                    <div class="text-indigo-400 mt-4 animate-pulse">> Awaiting payload injection...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('webhook-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submit-btn');
+            const logConsole = document.getElementById('log-console');
+            
+            const selectedRoute = document.getElementById('route-selector').value;
+            const name = document.getElementById('student-name').value;
+            const message = document.getElementById('message').value;
+
+            // UI Loading State
+            const originalBtnHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
+
+            const timestamp = new Date().toLocaleTimeString();
+
+            logConsole.innerHTML += `<div class="mt-6 text-fuchsia-400">[${timestamp}] POST request injected at /webhook/${selectedRoute}</div>`;
+            logConsole.innerHTML += `<div class="text-slate-400">↳ Accessing SQLite routing matrix... <span class="text-emerald-400">Found Target</span></div>`;
+            logConsole.innerHTML += `<div class="text-yellow-400">↳ Engaging AI inference engine...</div>`;
+            logConsole.scrollTop = logConsole.scrollHeight;
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/webhook/${selectedRoute}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: name, message: message })
+                });
+
+                const data = await response.json();
+                
+                if(response.ok) {
+                    logConsole.innerHTML += `<div class="text-slate-400">↳ Executing callback hook... <span class="text-emerald-400">Status ${data.executor_status_code}</span></div>`;
+                    
+                    let outputHtml = data.generated_text;
+                    
+                    if(outputHtml.includes("calendar.google.com")) {
+                        outputHtml = `<a href="${outputHtml.trim()}" target="_blank" class="inline-block mt-3 bg-white text-black px-5 py-2.5 rounded-lg font-bold shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:shadow-[0_0_25px_rgba(255,255,255,0.4)] transition-all">📅 Add Event to Google Calendar</a>`;
+                    } else {
+                        outputHtml = `<div class="text-indigo-200 font-sans tracking-wide leading-relaxed">${outputHtml.replace(/\n/g, '<br>')}</div>`;
+                    }
+
+                    logConsole.innerHTML += `<div class="mt-4 p-5 glass-panel rounded-xl border border-white/10 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-fuchsia-500"></div>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold block mb-3">AI Synthesis Complete</span>
+                        ${outputHtml}
+                    </div>`;
+                } else {
+                    logConsole.innerHTML += `<div class="text-red-400 mt-2">[CRITICAL] API Exception: ${data.detail || 'Routing failure'}</div>`;
+                }
+            } catch (error) {
+                logConsole.innerHTML += `<div class="text-red-500 mt-2 font-bold">[FATAL ERROR] Connection Refused. Verify FastAPI node is active on port 8000.</div>`;
+            }
+
+            // Restore UI
+            btn.disabled = false;
+            btn.innerHTML = originalBtnHtml;
+            btn.classList.remove('opacity-80', 'cursor-not-allowed');
+            logConsole.scrollTop = logConsole.scrollHeight;
+        });
+    </script>
+</body>
+</html>
