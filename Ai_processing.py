@@ -1,6 +1,7 @@
 import os
 import json
 import httpx
+import re
 from dotenv import load_dotenv
 from google import genai
 from twilio.rest import Client as TwilioClient
@@ -94,19 +95,52 @@ async def process_text(text, model: str, prompt_template: str = None) -> str:
                 return f"Ollama local node error: Status {res.status_code}"
         except Exception as e:
             return f"Edge processing offline: {str(e)}"
+
 async def send_to_action_url(text: str, url: str):
     """
-    Dispatches payloads to Discord webhooks.
+    Dispatches rich embeds to Discord webhooks with dynamic thread name extraction.
     """
-    if not url or url in ["calendar_action", "whatsapp_action", "sms_action"]:
+    if not url or url in ["calendar_action", "whatsapp_action", "sms_action", "email_action", "display_action"]:
         return DummyResponse(200)
 
-    # Payload structured for standard text channels (remove thread_name if using a standard # text channel)
+    # 1. Dynamic Thread Name Extraction
+    thread_match = re.search(r'\[Thread:\s*([^\]]+)\]', text, re.IGNORECASE)
+    thread_name = thread_match.group(1).strip() if thread_match else "⚡ Community Hub Sync"
+
+    # 2. Tag Scrubbing
+    cleaned_text = re.sub(r'\[Thread:\s*[^\]]+\]', '', text, flags=re.IGNORECASE)
+    cleaned_text = re.sub(r'\[Discord Channel:\s*[^\]]+\]', '', cleaned_text, flags=re.IGNORECASE).strip()
+
+    # 3. Rich Embed Payload Structure
     payload = {
-        "content": text.strip(),
-        "thread_name": "⚡ New Hub Announcement" 
+        "embeds": [
+            {
+                "title": f"📢 {thread_name}",
+                "description": cleaned_text,
+                "color": 6514417,  # Hex #6366F1 in integer format (Indigo accent)
+                "fields": [
+                    {
+                        "name": "⚙️ Execution Engine",
+                        "value": "Local Ollama Edge Node",
+                        "inline": True
+                    },
+                    {
+                        "name": "🛡️ Data Privacy",
+                        "value": "Zero Cloud Leakage",
+                        "inline": True
+                    }
+                ],
+                "footer": {
+                    "text": "Community Workflow Hub • GDG Hack Day 2026"
+                }
+            }
+        ]
     }
-    
+
+    # Attach thread_name at root if using forum / thread channels
+    if thread_name:
+        payload["thread_name"] = thread_name
+
     headers = {
         "Content-Type": "application/json",
         "User-Agent": "WorkflowHub/1.0"
