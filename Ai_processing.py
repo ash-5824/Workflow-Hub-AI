@@ -74,7 +74,15 @@ async def process_text(text, model: str, prompt_template: str = None) -> str:
                 model="gemini-3.6-flash",
                 contents=full_prompt,
             )
-            return response.text.strip()
+            result_text = response.text.strip()
+
+            # 🛑 FIX: Extract ONLY the URL for Calendar Route so the frontend button works
+            if is_calendar:
+                url_match = re.search(r'(https://calendar\.google\.com/calendar[^\s\n]+)', result_text)
+                if url_match:
+                    return url_match.group(1)
+                    
+            return result_text
         except Exception as e:
             return f"Gemini API Processing failed: {str(e)}"
             
