@@ -30,7 +30,7 @@ init_db()
 TWILIO_SID = os.environ.get("TWILIO_SID", "Enter your TWILIO_SID HERE")
 TWILIO_TOKEN = os.environ.get("TWILIO_TOKEN", "Enter your TWILIO_TOKEN HERE")
 TWILIO_PHONE = "+1234567890"  # Your Twilio Sandbox Number
-YOUR_PHONE = "+919690662431"  # Your Verified Personal Phone Number
+YOUR_PHONE = "+919999900000"  # Dummy Phone Number
 
 async def send_sms_alert(summary_text: str):
     """Helper function to send SMS using Twilio"""
