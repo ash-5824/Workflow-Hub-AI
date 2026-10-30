@@ -85,7 +85,11 @@ async def webhook(trigger_route: str, request: Request):
             incoming_text = str(body)
     except Exception:
         incoming_text = "GDG Hacktoberfest workshop update: Session moved to Lab Block B Room 204, starting at 9:00 AM."
-
+  if len(incoming_text) > 5000:
+    raise HTTPException(
+        status_code=413,
+        detail="Payload too large"
+    )
     # Final safety fallback if the input box was completely empty
     if not incoming_text or not incoming_text.strip():
         incoming_text = "GDG Hacktoberfest workshop update: Session moved to Lab Block B Room 204, starting at 9:00 AM."
