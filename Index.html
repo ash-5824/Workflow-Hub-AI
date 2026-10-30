@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Community Workflow Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- PDF.js for client-side PDF parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <!-- Mammoth.js for client-side DOCX parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
     <!-- Premium AI Startup Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script>
@@ -15,9 +21,7 @@
                         sans: ['Space Grotesk', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
                     },
-                    animation: {
-                        'blob': 'blob 7s infinite',
-                    },
+                    animation: { 'blob': 'blob 7s infinite' },
                     keyframes: {
                         blob: {
                             '0%': { transform: 'translate(0px, 0px) scale(1)' },
@@ -32,7 +36,6 @@
     </script>
     <style>
         body { background-color: #050505; color: #e5e5e5; overflow-x: hidden; }
-        /* Glowing scrollbar */
         .terminal-scroll::-webkit-scrollbar { width: 4px; }
         .terminal-scroll::-webkit-scrollbar-track { background: transparent; }
         .terminal-scroll::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.5); border-radius: 10px; }
@@ -102,6 +105,13 @@
                         <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Sender Identifier</label>
                         <input type="text" id="student-name" class="w-full input-dark rounded-xl px-4 py-3 text-sm transition-all" placeholder="e.g. Rahul" required>
                     </div>
+                    
+                    <!-- ENHANCED STRATEGY A: File Loader with PDF & DOCX -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">📂 Quick Load File (PDF, DOCX, TXT)</label>
+                        <input type="file" id="textFileInput" accept=".txt,.md,.py,.csv,.json,.pdf,.docx" class="w-full input-dark rounded-xl px-4 py-2 text-sm transition-all cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-indigo-500 file:text-white hover:file:bg-indigo-600">
+                    </div>
+
                     <div>
                         <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Raw Payload Data</label>
                         <textarea id="message" rows="5" class="w-full input-dark rounded-xl px-4 py-3 text-sm transition-all resize-none" placeholder="Inject unstructured data here..." required></textarea>
@@ -115,8 +125,6 @@
 
             <!-- Right Side: Cyber/macOS Style Execution Terminal -->
             <div class="lg:col-span-8 rounded-2xl shadow-2xl bg-black/60 overflow-hidden border border-white/10 flex flex-col h-[600px] backdrop-blur-xl">
-                
-                <!-- Terminal Header -->
                 <div class="bg-white/5 px-4 py-3 flex items-center border-b border-white/5">
                     <div class="flex gap-2">
                         <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
@@ -127,8 +135,6 @@
                         <span class="text-xs text-slate-500 font-mono tracking-wider">nexus-core-terminal ~ bash</span>
                     </div>
                 </div>
-                
-                <!-- Terminal Body -->
                 <div id="log-console" class="flex-1 p-6 font-mono text-sm terminal-scroll overflow-y-auto" style="line-height: 1.7;">
                     <div class="text-slate-500">System architecture: Hybrid Edge/Cloud Node</div>
                     <div class="text-slate-500">Initializing Nexus Engine... <span class="text-emerald-400">[OK]</span></div>
@@ -140,6 +146,54 @@
     </div>
 
     <script>
+        // Set up PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+        // Advanced Multi-format File Loader
+        document.getElementById('textFileInput').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const textarea = document.getElementById('message');
+            const originalPlaceholder = textarea.placeholder;
+            textarea.value = "Extracting text... please wait.";
+            
+            const extension = file.name.split('.').pop().toLowerCase();
+
+            try {
+                if (extension === 'pdf') {
+                    // Extract text from PDF
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                    let fullText = "";
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        fullText += textContent.items.map(item => item.str).join(" ") + "\n\n";
+                    }
+                    textarea.value = fullText.trim();
+                } 
+                else if (extension === 'docx') {
+                    // Extract text from Word Document
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
+                    textarea.value = result.value.trim();
+                } 
+                else {
+                    // Extract standard text/code files
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        textarea.value = event.target.result;
+                    };
+                    reader.readAsText(file);
+                }
+            } catch (error) {
+                console.error("Extraction error:", error);
+                textarea.value = `[ERROR] Failed to extract text from ${file.name}. Please try pasting the text manually.`;
+            }
+        });
+
+        // Main Webhook Submission Logic
         document.getElementById('webhook-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
